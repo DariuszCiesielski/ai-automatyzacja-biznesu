@@ -1,5 +1,9 @@
 🇬🇧 [English](README.md) | 🇵🇱 [Polski](README.pl.md)
 
+![Last updated](https://img.shields.io/badge/Last%20updated-April%202026-blue)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![Contributions welcome](https://img.shields.io/badge/Contributions-welcome-brightgreen.svg)
+
 # Przepisy na automatyzację AI dla polskich firm
 
 Praktyczne przepisy na automatyzacje AI, które oszczędzają **20+ godzin tygodniowo** w małych i średnich firmach. Każdy przepis to instrukcja krok po kroku — nie wymaga doświadczenia w programowaniu.
@@ -49,10 +53,17 @@ ai-automatyzacja-biznesu/
 
 Zapraszamy do dodawania nowych przepisów! Zobacz [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## 📬 Kontakt
+## Powiązane repozytoria
+
+- [ai-sprzedaz-i-leady](https://github.com/DariuszCiesielski/ai-sprzedaz-i-leady/blob/main/README.pl.md) — framework lead generation i sprzedaży z AI dla polskiego rynku
+- [ai-content-marketing](https://github.com/DariuszCiesielski/ai-content-marketing/blob/main/README.pl.md) — playbook content marketingu AI od briefu do publikacji
+- [strategia-marketingowa-ai](https://github.com/DariuszCiesielski/strategia-marketingowa-ai/blob/main/README.pl.md) — 7-etapowy framework marketingu AI dla MŚP
+
+## Bądź w kontakcie
 
 - **Newsletter**: [AI w Biznesie](https://aiwbiznesie.pl)
 - **LinkedIn**: [Dariusz Ciesielski](https://www.linkedin.com/in/dariuszciesielski/)
+- **Więcej repozytoriów**: [DariuszCiesielski na GitHub](https://github.com/DariuszCiesielski)
 
 ## Licencja
 
