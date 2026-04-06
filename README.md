@@ -1,5 +1,9 @@
 🇬🇧 [English](README.md) | 🇵🇱 [Polski](README.pl.md)
 
+![Last updated](https://img.shields.io/badge/Last%20updated-April%202026-blue)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![Contributions welcome](https://img.shields.io/badge/Contributions-welcome-brightgreen.svg)
+
 # AI Automation Recipes for Polish SMBs
 
 Practical AI automation workflows saving **20+ hours per week** for small and medium businesses. Each recipe is a step-by-step guide you can implement today — no coding experience required.
@@ -45,14 +49,21 @@ ai-automatyzacja-biznesu/
 └── README.md          # This file (English)
 ```
 
-## 🤝 Contributing
+## Contributing
 
-We welcome new recipes! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions, corrections, and practical business examples are welcome. Open an issue or PR if you want to improve a recipe or add a real-world use case.
 
-## 📬 Stay Connected
+## Related Repositories
+
+- [ai-sprzedaz-i-leady](https://github.com/DariuszCiesielski/ai-sprzedaz-i-leady) — AI lead generation and sales framework for the Polish market
+- [ai-content-marketing](https://github.com/DariuszCiesielski/ai-content-marketing) — AI content marketing playbook from brief to publication
+- [strategia-marketingowa-ai](https://github.com/DariuszCiesielski/strategia-marketingowa-ai) — 7-phase AI marketing framework for SMBs
+
+## Stay Connected
 
 - **Newsletter**: [AI w Biznesie](https://aiwbiznesie.pl)
 - **LinkedIn**: [Dariusz Ciesielski](https://www.linkedin.com/in/dariuszciesielski/)
+- **More repositories**: [DariuszCiesielski on GitHub](https://github.com/DariuszCiesielski)
 
 ## License
 
