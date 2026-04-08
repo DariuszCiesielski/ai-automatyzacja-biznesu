@@ -1,0 +1,263 @@
+{
+  "name": "Monitoring Konkurencji (AI)",
+  "flow": [
+    {
+      "id": 1,
+      "module": "builtin:BasicScheduler",
+      "version": 1,
+      "parameters": {
+        "scheduling": {
+          "type": "weekly",
+          "day": 1,
+          "time": "07:00"
+        }
+      },
+      "mapper": {},
+      "metadata": {
+        "designer": { "x": 0, "y": 0 },
+        "restore": {},
+        "expect": []
+      }
+    },
+    {
+      "id": 2,
+      "module": "builtin:BasicIterator",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "array": [
+          {
+            "name": "Konkurent A",
+            "url": "https://REPLACE_WITH_COMPETITOR_A_URL",
+            "pages": ["https://REPLACE_WITH_COMPETITOR_A_URL/cennik", "https://REPLACE_WITH_COMPETITOR_A_URL/oferta"]
+          },
+          {
+            "name": "Konkurent B",
+            "url": "https://REPLACE_WITH_COMPETITOR_B_URL",
+            "pages": ["https://REPLACE_WITH_COMPETITOR_B_URL/pricing", "https://REPLACE_WITH_COMPETITOR_B_URL/products"]
+          },
+          {
+            "name": "Konkurent C",
+            "url": "https://REPLACE_WITH_COMPETITOR_C_URL",
+            "pages": ["https://REPLACE_WITH_COMPETITOR_C_URL/oferta"]
+          }
+        ]
+      },
+      "metadata": {
+        "designer": { "x": 300, "y": 0 },
+        "restore": {},
+        "expect": [
+          {
+            "name": "array",
+            "type": "array",
+            "label": "Lista konkurentów"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "module": "http:ActionGetFile",
+      "version": 3,
+      "parameters": {
+        "handleErrors": true
+      },
+      "mapper": {
+        "url": "{{2.url}}",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "User-Agent",
+            "value": "Mozilla/5.0 (compatible; MonitorBot/1.0)"
+          }
+        ],
+        "qs": [],
+        "bodyType": "raw",
+        "parseResponse": true,
+        "timeout": 30,
+        "followRedirect": true,
+        "followAllRedirects": false
+      },
+      "metadata": {
+        "designer": { "x": 600, "y": 0 },
+        "restore": {},
+        "expect": [
+          { "name": "url", "type": "url", "label": "URL" },
+          { "name": "method", "type": "select", "label": "Metoda" }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "module": "google-sheets:ActionSearchRows",
+      "version": 4,
+      "parameters": {},
+      "mapper": {
+        "spreadsheetId": "REPLACE_WITH_YOUR_SPREADSHEET_ID",
+        "sheetId": "Snapshoty",
+        "tableFirstRow": "A1",
+        "filter": [
+          {
+            "a": "A",
+            "b": "{{2.name}}",
+            "o": "text:equal"
+          }
+        ],
+        "sortOrder": "desc",
+        "limit": 1
+      },
+      "metadata": {
+        "designer": { "x": 900, "y": 0 },
+        "restore": {
+          "parameters": {
+            "spreadsheetId": { "label": "Monitoring Konkurencji" },
+            "sheetId": { "label": "Snapshoty" }
+          }
+        },
+        "expect": [
+          { "name": "spreadsheetId", "type": "text", "label": "ID arkusza" },
+          { "name": "sheetId", "type": "text", "label": "Nazwa zakładki" }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "module": "openai:CreateChatCompletion",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "model": "gpt-4o-mini",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Jesteś analitykiem konkurencji dla polskiej firmy MŚP. Porównaj aktualną wersję strony z poprzednią i wypisz zmiany. Odpowiadaj ZAWSZE po polsku z polskimi znakami (ą,ć,ę,ł,ń,ó,ś,ź,ż).\n\nFormat odpowiedzi (JSON):\n{\"changes_detected\": true/false, \"significance\": \"wysoka|średnia|niska|brak\", \"summary\": \"krótkie podsumowanie po polsku\", \"details\": [\"zmiana 1\", \"zmiana 2\"], \"recommendation\": \"co z tym zrobić\"}"
+          },
+          {
+            "role": "user",
+            "content": "Konkurent: {{2.name}}\nURL: {{2.url}}\n\n--- AKTUALNA WERSJA ---\n{{3.data}}\n\n--- POPRZEDNIA WERSJA (snapshot) ---\n{{4.`0`.E}}\n\nPorównaj obie wersje i wypisz istotne zmiany biznesowe (ceny, oferta, funkcje, komunikacja). Ignoruj drobne zmiany techniczne (daty, cookie bannery)."
+          }
+        ],
+        "temperature": 0.3,
+        "max_tokens": 500,
+        "response_format": { "type": "json_object" }
+      },
+      "metadata": {
+        "designer": { "x": 1200, "y": 0 },
+        "restore": {},
+        "expect": [
+          { "name": "model", "type": "select", "label": "Model" },
+          { "name": "messages", "type": "array", "label": "Wiadomości" }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "module": "google-sheets:ActionAppendRow",
+      "version": 4,
+      "parameters": {},
+      "mapper": {
+        "spreadsheetId": "REPLACE_WITH_YOUR_SPREADSHEET_ID",
+        "sheetId": "Snapshoty",
+        "tableFirstRow": "A1",
+        "values": {
+          "A": "{{2.name}}",
+          "B": "{{2.url}}",
+          "C": "{{formatDate(now; \"YYYY-MM-DD HH:mm\")}}",
+          "D": "{{5.choices[0].message.content}}",
+          "E": "{{3.data}}"
+        }
+      },
+      "metadata": {
+        "designer": { "x": 1500, "y": 0 },
+        "restore": {
+          "parameters": {
+            "spreadsheetId": { "label": "Monitoring Konkurencji" },
+            "sheetId": { "label": "Snapshoty" }
+          }
+        },
+        "expect": [
+          { "name": "spreadsheetId", "type": "text", "label": "ID arkusza" },
+          { "name": "sheetId", "type": "text", "label": "Nazwa zakładki" }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "module": "builtin:BasicRouter",
+      "version": 1,
+      "parameters": {},
+      "mapper": {},
+      "metadata": {
+        "designer": { "x": 1800, "y": 0 },
+        "restore": {},
+        "expect": []
+      },
+      "routes": [
+        {
+          "flow": [
+            {
+              "id": 8,
+              "module": "google-email:ActionSendEmail",
+              "version": 2,
+              "parameters": {},
+              "mapper": {
+                "to": "REPLACE_WITH_YOUR_EMAIL",
+                "subject": "🔔 Zmiana u konkurencji: {{2.name}} ({{formatDate(now; \"DD.MM.YYYY\")}})",
+                "content": "<h2>Wykryto istotne zmiany u: {{2.name}}</h2>\n<p><strong>URL:</strong> <a href=\"{{2.url}}\">{{2.url}}</a></p>\n<p><strong>Znaczenie:</strong> {{5.choices[0].message.content.significance}}</p>\n<h3>Podsumowanie</h3>\n<p>{{5.choices[0].message.content.summary}}</p>\n<h3>Rekomendacja</h3>\n<p>{{5.choices[0].message.content.recommendation}}</p>\n<hr>\n<p><em>Wygenerowano automatycznie przez Make.com — Monitoring Konkurencji</em></p>",
+                "isHtml": true
+              },
+              "metadata": {
+                "designer": { "x": 2100, "y": -150 },
+                "restore": {},
+                "expect": [
+                  { "name": "to", "type": "email", "label": "Odbiorca" },
+                  { "name": "subject", "type": "text", "label": "Temat" },
+                  { "name": "content", "type": "text", "label": "Treść" }
+                ]
+              }
+            }
+          ],
+          "filter": {
+            "name": "Znaczące zmiany",
+            "conditions": [
+              [
+                {
+                  "a": "{{5.choices[0].message.content.significance}}",
+                  "b": "brak",
+                  "o": "text:notEqual"
+                },
+                {
+                  "a": "{{5.choices[0].message.content.changes_detected}}",
+                  "b": "true",
+                  "o": "text:equal"
+                }
+              ]
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "version": 1,
+    "scenario": {
+      "roundtrips": 1,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "autoCommitTriggerLast": true,
+      "sequential": false,
+      "confidential": false,
+      "dataloss": false,
+      "dlq": false
+    },
+    "designer": {
+      "orphans": []
+    },
+    "zone": "eu2.make.com"
+  },
+  "scheduling": {
+    "type": "weekly",
+    "day": 1,
+    "time": "07:00"
+  }
+}

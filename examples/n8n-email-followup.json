@@ -1,0 +1,251 @@
+{
+  "name": "Auto Follow-up Email (AI)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Codziennie o 8:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": 50,
+        "filters": {
+          "q": "is:sent -in:draft after:{{$today.minus({days:2}).toFormat('yyyy/MM/dd')}} -has:userlabels",
+          "includeSpamTrash": false
+        },
+        "options": {}
+      },
+      "id": "gmail-check-sent",
+      "name": "Gmail — wysłane bez odpowiedzi (48h)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [480, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": 200,
+        "filters": {
+          "q": "is:inbox after:{{$today.minus({days:2}).toFormat('yyyy/MM/dd')}}",
+          "includeSpamTrash": false
+        },
+        "options": {}
+      },
+      "id": "gmail-check-inbox",
+      "name": "Gmail — sprawdź odpowiedzi w inbox",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [480, 520],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "threadId",
+              "field2": "threadId"
+            }
+          ]
+        },
+        "joinMode": "keepNonMatches",
+        "outputDataFrom": "input1",
+        "options": {}
+      },
+      "id": "merge-filter",
+      "name": "Filtruj — tylko bez odpowiedzi",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [720, 400]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "message",
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Jesteś asystentem sprzedażowym polskiej firmy MŚP. Pisz krótkie, uprzejme follow-upy po polsku. Używaj polskich znaków (ą,ć,ę,ł,ń,ó,ś,ź,ż). Ton: profesjonalny ale ciepły, bez nachalności. Maksymalnie 4-5 zdań."
+            },
+            {
+              "role": "user",
+              "content": "Napisz follow-up do wiadomości, na którą nie dostałem odpowiedzi od 48h.\n\nOryginalny temat: {{$json.subject}}\nOdbiorca: {{$json.to}}\nTreść oryginału (skrót): {{$json.snippet}}\n\nZwróć TYLKO treść follow-upu, bez tematu."
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 300
+        }
+      },
+      "id": "openai-generate",
+      "name": "OpenAI — generuj follow-up",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [960, 400],
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{$('merge-filter').item.json.to}}",
+        "subject": "Re: {{$('merge-filter').item.json.subject}}",
+        "emailType": "text",
+        "message": "={{$json.message.content}}",
+        "options": {
+          "threadId": "={{$('merge-filter').item.json.threadId}}"
+        }
+      },
+      "id": "gmail-send-followup",
+      "name": "Gmail — wyślij follow-up",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1200, 400],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_YOUR_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Follow-upy",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data": "={{$today.toFormat('yyyy-MM-dd HH:mm')}}",
+            "Odbiorca": "={{$('merge-filter').item.json.to}}",
+            "Temat": "={{$('merge-filter').item.json.subject}}",
+            "Treść follow-upu": "={{$('openai-generate').item.json.message.content}}",
+            "Status": "Wysłano"
+          },
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "gsheets-log",
+      "name": "Google Sheets — loguj follow-up",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1440, 400],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Codziennie o 8:00": {
+      "main": [
+        [
+          { "node": "Gmail — wysłane bez odpowiedzi (48h)", "type": "main", "index": 0 },
+          { "node": "Gmail — sprawdź odpowiedzi w inbox", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Gmail — wysłane bez odpowiedzi (48h)": {
+      "main": [
+        [
+          { "node": "Filtruj — tylko bez odpowiedzi", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Gmail — sprawdź odpowiedzi w inbox": {
+      "main": [
+        [
+          { "node": "Filtruj — tylko bez odpowiedzi", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "Filtruj — tylko bez odpowiedzi": {
+      "main": [
+        [
+          { "node": "OpenAI — generuj follow-up", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "OpenAI — generuj follow-up": {
+      "main": [
+        [
+          { "node": "Gmail — wyślij follow-up", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Gmail — wyślij follow-up": {
+      "main": [
+        [
+          { "node": "Google Sheets — loguj follow-up", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "tags": [
+    { "name": "email" },
+    { "name": "ai" },
+    { "name": "follow-up" },
+    { "name": "automatyzacja" }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-04-08T00:00:00.000Z",
+  "versionId": "1"
+}

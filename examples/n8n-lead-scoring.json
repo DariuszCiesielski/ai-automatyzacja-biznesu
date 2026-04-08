@@ -1,0 +1,360 @@
+{
+  "name": "AI Lead Scoring + Routing",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-scoring",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook — nowy lead",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 400],
+      "webhookId": "lead-scoring-webhook"
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "message",
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Jesteś ekspertem od kwalifikacji leadów B2B w polskim MŚP. Oceń lead w skali 1-10 na podstawie podanych danych. Zwróć JSON: {\"score\": <number>, \"reasoning\": \"<krótkie uzasadnienie po polsku>\", \"segment\": \"hot|warm|cold\"}\n\nKryteria scoringu:\n- Wielkość firmy (>50 pracowników = +2)\n- Budżet (podany i >5000 PLN = +2)\n- Pilność (szuka rozwiązania teraz = +2)\n- Dopasowanie do ICP (branża, lokalizacja = +2)\n- Kompletność danych (email firmowy, telefon = +2)\n\nSegmenty: hot (8-10), warm (4-7), cold (1-3)"
+            },
+            {
+              "role": "user",
+              "content": "Dane leada:\n- Imię: {{$json.body.name}}\n- Email: {{$json.body.email}}\n- Firma: {{$json.body.company}}\n- Stanowisko: {{$json.body.position}}\n- Wielkość firmy: {{$json.body.company_size}}\n- Budżet: {{$json.body.budget}}\n- Wiadomość: {{$json.body.message}}\n- Źródło: {{$json.body.source}}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 200,
+          "response_format": { "type": "json_object" }
+        }
+      },
+      "id": "openai-score",
+      "name": "OpenAI — oceń lead",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [480, 400],
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiResponse = JSON.parse($input.item.json.message.content);\nconst leadData = $('Webhook — nowy lead').item.json.body;\n\nreturn {\n  json: {\n    ...leadData,\n    score: aiResponse.score,\n    reasoning: aiResponse.reasoning,\n    segment: aiResponse.segment,\n    scored_at: new Date().toISOString()\n  }\n};"
+      },
+      "id": "parse-score",
+      "name": "Parsuj wynik scoringu",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "hot",
+              "leftValue": "={{$json.score}}",
+              "rightValue": 7,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-hot",
+      "name": "IF — gorący lead (>7)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [960, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "warm",
+              "leftValue": "={{$json.score}}",
+              "rightValue": 3,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-warm",
+      "name": "IF — ciepły lead (4-7)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1200, 560]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://REPLACE_WITH_YOUR_CRM_URL/api/contacts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer REPLACE_WITH_YOUR_CRM_API_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "name", "value": "={{$json.name}}" },
+            { "name": "email", "value": "={{$json.email}}" },
+            { "name": "company", "value": "={{$json.company}}" },
+            { "name": "score", "value": "={{$json.score}}" },
+            { "name": "segment", "value": "hot" },
+            { "name": "source", "value": "={{$json.source}}" },
+            { "name": "notes", "value": "={{$json.reasoning}}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "crm-push-hot",
+      "name": "CRM — dodaj gorący lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 280]
+    },
+    {
+      "parameters": {
+        "channel": "#sprzedaz",
+        "text": ":fire: *Gorący lead!* (Score: {{$json.score}}/10)\n\n*{{$json.name}}* z {{$json.company}}\nStanowisko: {{$json.position}}\nEmail: {{$json.email}}\nBudżet: {{$json.budget}}\n\n_{{$json.reasoning}}_",
+        "otherOptions": {}
+      },
+      "id": "slack-notify",
+      "name": "Slack — powiadom zespół",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [1440, 280],
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_SLACK_CREDENTIAL_ID",
+          "name": "Slack OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_YOUR_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Nurture",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data": "={{$json.scored_at}}",
+            "Imię": "={{$json.name}}",
+            "Email": "={{$json.email}}",
+            "Firma": "={{$json.company}}",
+            "Score": "={{$json.score}}",
+            "Segment": "warm",
+            "Uzasadnienie": "={{$json.reasoning}}"
+          },
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "gsheets-nurture",
+      "name": "Google Sheets — lista nurture",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1440, 480],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_YOUR_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Archiwum",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data": "={{$json.scored_at}}",
+            "Imię": "={{$json.name}}",
+            "Email": "={{$json.email}}",
+            "Firma": "={{$json.company}}",
+            "Score": "={{$json.score}}",
+            "Uzasadnienie": "={{$json.reasoning}}"
+          },
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "gsheets-archive",
+      "name": "Google Sheets — archiwum",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1440, 680],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"status\": \"scored\", \"score\": {{$('Parsuj wynik scoringu').item.json.score}}, \"segment\": \"{{$('Parsuj wynik scoringu').item.json.segment}}\"}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "webhook-response",
+      "name": "Webhook — odpowiedź",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1680, 400]
+    }
+  ],
+  "connections": {
+    "Webhook — nowy lead": {
+      "main": [
+        [
+          { "node": "OpenAI — oceń lead", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "OpenAI — oceń lead": {
+      "main": [
+        [
+          { "node": "Parsuj wynik scoringu", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Parsuj wynik scoringu": {
+      "main": [
+        [
+          { "node": "IF — gorący lead (>7)", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "IF — gorący lead (>7)": {
+      "main": [
+        [
+          { "node": "CRM — dodaj gorący lead", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "IF — ciepły lead (4-7)", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "CRM — dodaj gorący lead": {
+      "main": [
+        [
+          { "node": "Slack — powiadom zespół", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Slack — powiadom zespół": {
+      "main": [
+        [
+          { "node": "Webhook — odpowiedź", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "IF — ciepły lead (4-7)": {
+      "main": [
+        [
+          { "node": "Google Sheets — lista nurture", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Google Sheets — archiwum", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Google Sheets — lista nurture": {
+      "main": [
+        [
+          { "node": "Webhook — odpowiedź", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Google Sheets — archiwum": {
+      "main": [
+        [
+          { "node": "Webhook — odpowiedź", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "tags": [
+    { "name": "lead-scoring" },
+    { "name": "ai" },
+    { "name": "crm" },
+    { "name": "automatyzacja" }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-04-08T00:00:00.000Z",
+  "versionId": "1"
+}
