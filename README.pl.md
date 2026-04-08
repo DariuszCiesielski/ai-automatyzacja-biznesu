@@ -22,6 +22,7 @@ Praktyczne przepisy na automatyzacje AI, które oszczędzają **20+ godzin tygod
 | 8 | [Kategoryzacja maili](recipes/email-categorization.md) | Przeładowana skrzynka, pominięte ważne maile | Średniozaawansowany | 3-5 h/tyg |
 | 9 | [Raporty tygodniowe z AI](recipes/report-generation.md) | Godziny na ręczne kompilowanie raportów | Zaawansowany | 4-6 h/tyg |
 | 10 | [Chatbot FAQ z AI](recipes/chatbot-faq.md) | Powtarzające się pytania od klientów | Średniozaawansowany | 5-10 h/tyg |
+| 11 | [Pipeline outreach z AI](recipes/ai-outreach-pipeline.md) | Zero outreachu, brak leadów | Średniozaawansowany | 5-10 h/tyg |
 
 ## 🚀 Jak zacząć
 
@@ -42,7 +43,7 @@ Praktyczne przepisy na automatyzacje AI, które oszczędzają **20+ godzin tygod
 
 ```
 ai-automatyzacja-biznesu/
-├── recipes/           # 10 przepisów na automatyzacje (po polsku)
+├── recipes/           # 11 przepisów na automatyzacje (po polsku)
 ├── templates/         # Szablony promptów i wiadomości
 ├── CONTRIBUTING.md    # Jak dodać nowy przepis
 ├── LICENSE            # MIT

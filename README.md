@@ -22,6 +22,7 @@ Practical AI automation workflows saving **20+ hours per week** for small and me
 | 8 | [Email Categorization](recipes/email-categorization.md) | Inbox overload, missed important emails | Intermediate | 3-5 h/week |
 | 9 | [Weekly Business Reports](recipes/report-generation.md) | Hours spent compiling manual reports | Advanced | 4-6 h/week |
 | 10 | [AI FAQ Chatbot](recipes/chatbot-faq.md) | Repetitive customer support questions | Intermediate | 5-10 h/week |
+| 11 | [AI Outreach Pipeline](recipes/ai-outreach-pipeline.md) | Zero outreach, no leads coming in | Intermediate | 5-10 h/week |
 
 ## 🚀 Getting Started
 
@@ -42,7 +43,7 @@ Practical AI automation workflows saving **20+ hours per week** for small and me
 
 ```
 ai-automatyzacja-biznesu/
-├── recipes/           # 10 automation recipes (in Polish)
+├── recipes/           # 11 automation recipes (in Polish)
 ├── templates/         # Reusable prompt and email templates
 ├── CONTRIBUTING.md    # How to submit new recipes
 ├── LICENSE            # MIT
