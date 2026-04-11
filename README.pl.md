@@ -1,71 +1,122 @@
-🇬🇧 [English](README.md) | 🇵🇱 [Polski](README.pl.md)
+<div align="center">
 
-![Last updated](https://img.shields.io/badge/Last%20updated-April%202026-blue)
+# AI Automation Recipes for Polish SMBs
+
+**Practical AI automation workflows saving 20+ hours per week.**
+**No coding required. Step by step. Ready to deploy.**
+
+![Language: English](https://img.shields.io/badge/Language-English-blue)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
-![Contributions welcome](https://img.shields.io/badge/Contributions-welcome-brightgreen.svg)
+![Recipes: 11](https://img.shields.io/badge/Recipes-11-blue)
+![Templates: 4](https://img.shields.io/badge/Templates-4-orange)
 
-# Przepisy na automatyzację AI dla polskich firm
+🇵🇱 [Polski](README.md) | 🇬🇧 [English](README.pl.md)
 
-Praktyczne przepisy na automatyzacje AI, które oszczędzają **20+ godzin tygodniowo** w małych i średnich firmach. Każdy przepis to instrukcja krok po kroku — nie wymaga doświadczenia w programowaniu.
+</div>
 
-## 📋 Przepisy
+---
 
-| # | Przepis | Rozwiązywany problem | Poziom | Oszczędność |
-|---|---------|---------------------|--------|-------------|
-| 1 | [Automatyczne follow-upy](recipes/auto-follow-up-email.md) | Leady stygną po pierwszym kontakcie | Początkujący | 3-5 h/tyg |
-| 2 | [Scoring leadów z AI](recipes/lead-scoring-ai.md) | Marnowanie czasu na słabe leady | Średniozaawansowany | 5-8 h/tyg |
-| 3 | [Harmonogram social media](recipes/social-media-scheduler.md) | Ręczne publikowanie na platformach | Początkujący | 4-6 h/tyg |
-| 4 | [Przypomnienia o płatnościach](recipes/invoice-reminder.md) | Ręczne ściganie niezapłaconych faktur | Początkujący | 2-3 h/tyg |
-| 5 | [Onboarding klienta](recipes/customer-onboarding.md) | Niespójne doświadczenie nowego klienta | Średniozaawansowany | 5-7 h/tyg |
-| 6 | [Monitoring konkurencji](recipes/competitor-monitoring.md) | Przeoczenie zmian cen/treści konkurencji | Zaawansowany | 3-5 h/tyg |
-| 7 | [Notatki ze spotkań z AI](recipes/meeting-notes-summary.md) | Zagubione ustalenia ze spotkań | Początkujący | 2-4 h/tyg |
-| 8 | [Kategoryzacja maili](recipes/email-categorization.md) | Przeładowana skrzynka, pominięte ważne maile | Średniozaawansowany | 3-5 h/tyg |
-| 9 | [Raporty tygodniowe z AI](recipes/report-generation.md) | Godziny na ręczne kompilowanie raportów | Zaawansowany | 4-6 h/tyg |
-| 10 | [Chatbot FAQ z AI](recipes/chatbot-faq.md) | Powtarzające się pytania od klientów | Średniozaawansowany | 5-10 h/tyg |
-| 11 | [Pipeline outreach z AI](recipes/ai-outreach-pipeline.md) | Zero outreachu, brak leadów | Średniozaawansowany | 5-10 h/tyg |
+## Why it matters
 
-## 🚀 Jak zacząć
+| | Fact | Source |
+|---|------|--------|
+| :chart_with_downwards_trend: | **~12% of Polish companies** use AI in marketing (vs 34% EU average) | Eurostat 2025 |
+| :clock3: | AI automation saves **~20h/week** on repetitive tasks | McKinsey 2025 |
+| :rocket: | AI automation market in Poland grows **40% year-over-year** | IDC CEE 2025 |
 
-1. Wybierz przepis pasujący do Twojego największego pochłaniacza czasu
-2. Przeczytaj sekcję „Potrzebne narzędzia" — większość ma darmowe plany
-3. Postępuj zgodnie z instrukcją krok po kroku
-4. Dostosuj triggery i szablony do swojego biznesu
+Polish SMBs have a massive gap to close. These recipes help bridge it — no consultant budget or coding skills required.
 
-## 🛠 Najczęściej używane narzędzia
+---
 
-- **[n8n](https://n8n.io)** — automatyzacja workflow (self-hosted lub chmura)
-- **[Make.com](https://make.com)** — wizualna platforma automatyzacji
-- **[Zapier](https://zapier.com)** — automatyzacja bez kodu
-- **OpenAI / Claude API** — generowanie i analiza tekstu z AI
-- **Google Workspace / Microsoft 365** — poczta, kalendarz, dokumenty
+## Recipes
 
-## 📁 Struktura repozytorium
+| # | Recipe | Problem Solved | Difficulty | Time Saved |
+|---|--------|---------------|------------|------------|
+| 1 | [Auto Follow-up Emails](recipes/auto-follow-up-email.md) | Leads going cold after initial contact | Beginner | 3-5 h/week |
+| 2 | [AI Lead Scoring](recipes/lead-scoring-ai.md) | Wasting time on low-quality leads | Intermediate | 5-8 h/week |
+| 3 | [Social Media Scheduler](recipes/social-media-scheduler.md) | Manual posting across platforms | Beginner | 4-6 h/week |
+| 4 | [Invoice Payment Reminders](recipes/invoice-reminder.md) | Chasing unpaid invoices manually | Beginner | 2-3 h/week |
+| 5 | [Customer Onboarding](recipes/customer-onboarding.md) | Inconsistent new customer experience | Intermediate | 5-7 h/week |
+| 6 | [Competitor Monitoring](recipes/competitor-monitoring.md) | Missing competitor price/content changes | Advanced | 3-5 h/week |
+| 7 | [Meeting Notes & Actions](recipes/meeting-notes-summary.md) | Lost action items from meetings | Beginner | 2-4 h/week |
+| 8 | [Email Categorization](recipes/email-categorization.md) | Inbox overload, missed important emails | Intermediate | 3-5 h/week |
+| 9 | [Weekly Business Reports](recipes/report-generation.md) | Hours spent compiling manual reports | Advanced | 4-6 h/week |
+| 10 | [AI FAQ Chatbot](recipes/chatbot-faq.md) | Repetitive customer support questions | Intermediate | 5-10 h/week |
+| 11 | [AI Outreach Pipeline](recipes/ai-outreach-pipeline.md) | Zero outreach, no leads coming in | Intermediate | 5-10 h/week |
+
+> **Total: up to 41-69 hours per week** saved when all recipes are implemented.
+
+---
+
+## Who is this for
+
+| Role | What you'll find |
+|------|-----------------|
+| **CEO / SMB Owner** | Ready-made automations that free up your team without hiring a developer |
+| **Marketer** | Recipes for content, social media, lead scoring, and AI outreach |
+| **Operations Specialist** | Automation for reports, invoices, onboarding, and internal communication |
+
+---
+
+## Getting Started
+
+1. **Pick a recipe** — start with your biggest time sink
+2. **Read "Tools Needed"** — most use free tiers
+3. **Follow step by step** — each recipe takes you from zero to a working automation
+4. **Customize** — adjust triggers, templates, and parameters for your business
+
+---
+
+## Tools Used
+
+- **[n8n](https://n8n.io)** — open-source workflow automation (self-hosted or cloud)
+- **[Make.com](https://make.com)** — visual automation platform
+- **[Zapier](https://zapier.com)** — no-code automation
+- **OpenAI / Claude API** — AI text generation and analysis
+- **Google Workspace / Microsoft 365** — email, calendar, docs
+
+---
+
+## Repository Structure
 
 ```
 ai-automatyzacja-biznesu/
-├── recipes/           # 11 przepisów na automatyzacje (po polsku)
-├── templates/         # Szablony promptów i wiadomości
-├── CONTRIBUTING.md    # Jak dodać nowy przepis
+├── recipes/           # 11 automation recipes
+├── templates/         # Reusable prompt and email templates
+├── examples/          # Ready-made configs (n8n, Make.com)
+├── CONTRIBUTING.md    # How to submit new recipes
 ├── LICENSE            # MIT
-└── README.pl.md       # Ten plik (polski)
+└── README.md          # Main file (Polish)
 ```
 
-## 🤝 Współpraca
+---
 
-Zapraszamy do dodawania nowych przepisów! Zobacz [CONTRIBUTING.md](CONTRIBUTING.md).
+## Related Repositories
 
-## Powiązane repozytoria
+- [ai-sprzedaz-i-leady](https://github.com/DariuszCiesielski/ai-sprzedaz-i-leady) — AI lead generation and sales framework for the Polish market
+- [ai-content-marketing](https://github.com/DariuszCiesielski/ai-content-marketing) — AI content marketing playbook from brief to publication
+- [strategia-marketingowa-ai](https://github.com/DariuszCiesielski/strategia-marketingowa-ai) — 7-phase AI marketing framework for SMBs
 
-- [ai-sprzedaz-i-leady](https://github.com/DariuszCiesielski/ai-sprzedaz-i-leady/blob/main/README.pl.md) — framework lead generation i sprzedaży z AI dla polskiego rynku
-- [ai-content-marketing](https://github.com/DariuszCiesielski/ai-content-marketing/blob/main/README.pl.md) — playbook content marketingu AI od briefu do publikacji
-- [strategia-marketingowa-ai](https://github.com/DariuszCiesielski/strategia-marketingowa-ai/blob/main/README.pl.md) — 7-etapowy framework marketingu AI dla MŚP
+---
 
-## Bądź w kontakcie
+## Want to implement this in your company?
 
-- **Newsletter**: [AI w Biznesie](https://aiwbiznesie.pl)
-- **LinkedIn**: [Dariusz Ciesielski](https://www.linkedin.com/in/dariuszciesielski/)
-- **Więcej repozytoriów**: [DariuszCiesielski na GitHub](https://github.com/DariuszCiesielski)
+If you'd like to deploy these automations but don't have the time to do it yourself — we can help.
 
-## Licencja
+| | |
+|---|---|
+| :globe_with_meridians: **Website** | [aiwbiznesie.online](https://aiwbiznesie.online) |
+| :handshake: **Implementation & consulting** | [aiwbiznesie.online/kontakt](https://aiwbiznesie.online/kontakt/) |
+| :briefcase: **LinkedIn** | [Dariusz Ciesielski](https://www.linkedin.com/in/dariuszciesielski/) |
 
-MIT — używaj swobodnie w swoim biznesie.
+---
+
+<div align="center">
+
+Built by **[AI w Biznesie](https://aiwbiznesie.online)**
+
+</div>
+
+## License
+
+MIT — use freely in your business. See [LICENSE](LICENSE) for details.
